@@ -154,10 +154,11 @@ function addCard(id, label) {
   const card = document.createElement("div");
   card.className = "card";
   card.innerHTML = `
-        <strong>ID:</strong> ${id} <br> 
+        <strong>ID:</strong> ${id} <br>
         <strong>ラベル:</strong> ${label} <br>
         <label for="hint-level-${id}">ヒントレベル:</label>
         <select id="hint-level-${id}">
+            <option value="0">無し</option>
             <option value="1">Lv1</option>
             <option value="2">Lv2</option>
             <option value="3">Lv3</option>
