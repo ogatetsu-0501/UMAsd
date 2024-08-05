@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>計算ツール</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>計算ツール</h1>
+    <input type="file" id="calc-result-file-input" accept=".csv">
+    <div>
+        <label for="id-select">IDを選択:</label>
+        <select id="id-select">
+            <!-- 動的にJavaScriptでオプションを追加します -->
+        </select>
+    </div>
+    <div>
+        <label for="label-input">ラベルを入力:</label>
+        <input type="text" id="label-input" list="label-datalist">
+        <datalist id="label-datalist">
+            <!-- 動的にJavaScriptでオプションを追加します -->
+        </datalist>
+    </div>
+    <button id="add-button" disabled>追加</button>
+    <div id="card-container">
+        <!-- ここにカードが追加されます -->
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
