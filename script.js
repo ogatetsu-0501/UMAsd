@@ -5,6 +5,7 @@ document
 let csvData = [];
 let skillData = [];
 let currentLabels = [];
+const hintLevels = [1, 0.9, 0.8, 0.7, 0.65, 0.6];
 
 // スキルデータを自動で読み込む
 window.onload = function () {
@@ -139,7 +140,8 @@ document.getElementById("add-button").addEventListener("click", function () {
     const initialSkill = csvData.find(
       (item) => item.id == selectedId && item.label == selectedLabel
     );
-    addCard(initialSkill.key, selectedLabel);
+    console.log("Initial Skill:", initialSkill);
+    addCard(initialSkill.key, selectedLabel, initialSkill.skill_id);
     handleSkillChain(selectedId, selectedLabel);
     // ラベル入力欄を空にし、予測変換も初期化する
     document.getElementById("label-input").value = "";
@@ -149,24 +151,72 @@ document.getElementById("add-button").addEventListener("click", function () {
 });
 
 // カードを追加する関数
-function addCard(id, label) {
+function addCard(key, label, skillId) {
   const cardContainer = document.getElementById("card-container");
+  const matchingItems = csvData.filter((item) => item.key === key);
+  console.log("Matching Items:", matchingItems);
+
+  const lengths = matchingItems
+    .map((item) => parseFloat(item.length))
+    .filter((length) => !isNaN(length));
+  console.log("Lengths:", lengths);
+
+  let average = 0;
+  let median = 0;
+  let max = 0;
+
+  if (lengths.length > 0) {
+    average = lengths.reduce((a, b) => a + b, 0) / lengths.length;
+    lengths.sort((a, b) => a - b);
+    median = lengths[Math.floor(lengths.length / 2)];
+    max = Math.max(...lengths);
+  }
+  console.log("Average:", average);
+  console.log("Median:", median);
+  console.log("Max:", max);
+
+  const skill = skillData.find((item) => item.id == skillId);
+  const spValue = skill ? parseInt(skill.SP) : "N/A";
+  console.log("Skill Data:", skill);
+  console.log("SP Value:", spValue);
+
   const card = document.createElement("div");
   card.className = "card";
   card.innerHTML = `
-        <strong>ID:</strong> ${id} <br>
+        <strong>Key:</strong> ${key} <br>
         <strong>ラベル:</strong> ${label} <br>
-        <label for="hint-level-${id}">ヒントレベル:</label>
-        <select id="hint-level-${id}">
-            <option value="0">無し</option>
-            <option value="1">Lv1</option>
-            <option value="2">Lv2</option>
-            <option value="3">Lv3</option>
-            <option value="4">Lv4</option>
-            <option value="5">Lv5</option>
+        <strong>SP:</strong> <span id="sp-value-${key}">${spValue}</span> <br>
+        <label>
+            <input type="radio" name="length-option-${key}" value="average" checked>
+            平均バ身: ${average.toFixed(2)}
+        </label> <br>
+        <label>
+            <input type="radio" name="length-option-${key}" value="median">
+            中央値バ身: ${median.toFixed(2)}
+        </label> <br>
+        <label>
+            <input type="radio" name="length-option-${key}" value="max">
+            最大バ身: ${max.toFixed(2)}
+        </label> <br>
+        <label for="hint-level-${key}">ヒントレベル:</label>
+        <select id="hint-level-${key}">
+            ${hintLevels
+              .map(
+                (level, index) => `<option value="${level}">${index}</option>`
+              )
+              .join("")}
         </select>
     `;
   cardContainer.appendChild(card);
+
+  // ヒントレベルのプルダウンが更新された時のイベントリスナーを追加
+  document
+    .getElementById(`hint-level-${key}`)
+    .addEventListener("change", function () {
+      const hintLevel = parseFloat(this.value);
+      const displaySpValue = Math.round(spValue * hintLevel);
+      document.getElementById(`sp-value-${key}`).textContent = displaySpValue;
+    });
 }
 
 // スキルチェーンを処理する関数
@@ -217,7 +267,7 @@ function handleSkillChain(selectId, initialLabel) {
 
     // 組み合わせスキルが存在する場合、カードを追加
     if (combinedSkill) {
-      addCard(combinedId, combinedSkill.label);
+      addCard(combinedId, combinedSkill.label, subSkillId);
       // 次のスキルIDを更新してループを続ける
       skillId = subSkillId;
     } else {
