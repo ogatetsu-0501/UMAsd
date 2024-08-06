@@ -5,7 +5,7 @@ document
 let csvData = [];
 let skillData = [];
 let currentLabels = [];
-const hintLevels = [1, 0.9, 0.8, 0.7, 0.65, 0.6];
+const hintLevels = [1, 0.9, 0.8, 0.8, 0.7, 0.6];
 
 // スキルデータを自動で読み込む
 window.onload = function () {
@@ -520,9 +520,12 @@ function removeCard(key) {
   // 下位スキルリストを初期化
   let subSkillList = [];
 
-  // すべてのカードの下位スキルをリストに追加
-  skillData.forEach((skill) => {
-    if (skill["下位スキル"] && skill["下位スキル"] !== "") {
+  // 画面に表示されているカードのskill_idと一致するスキルの下位スキルのみリストに追加
+  const cards = Array.from(document.getElementsByClassName("card"));
+  cards.forEach((card) => {
+    const skillId = card.dataset.skillId;
+    const skill = skillData.find((item) => item.id == skillId);
+    if (skill && skill["下位スキル"] && skill["下位スキル"] !== "") {
       subSkillList.push(skill["下位スキル"]);
     }
   });
@@ -530,7 +533,9 @@ function removeCard(key) {
   console.log("Sub Skill List:", subSkillList);
 
   // 削除するカードのスキル名を取得
-  const skillName = csvData.find((item) => item.key == key).label;
+  const skillIdToRemove = csvData.find((item) => item.key == key).skill_id;
+  const skillToRemove = skillData.find((item) => item.id == skillIdToRemove);
+  const skillName = skillToRemove ? skillToRemove["スキル名"] : "";
 
   // 下位スキルリストに存在するか確認
   if (subSkillList.includes(skillName)) {
