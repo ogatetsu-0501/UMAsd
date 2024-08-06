@@ -37,3 +37,7 @@ h1 {
     flex: 1;
     margin: 5px;
 }
+
+#table-container {
+    display: none;
+}

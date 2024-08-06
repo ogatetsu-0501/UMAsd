@@ -17,17 +17,101 @@ window.onload = function () {
     });
 };
 
-// 計算結果ファイルが選択されたときの処理
-function handleCalcResultFileSelect(event) {
-  const file = event.target.files[0];
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const text = e.target.result;
-    csvData = parseResultCSVWithKey(text);
-    console.log("CSV Data:", csvData);
-    populateIdSelect();
-  };
-  reader.readAsText(file);
+// 表示形式を切り替えるボタンのイベントリスナー
+document
+  .getElementById("toggle-view-button")
+  .addEventListener("click", function () {
+    const cardContainer = document.getElementById("card-container");
+    const tableContainer = document.getElementById("table-container");
+    if (cardContainer.style.display === "none") {
+      cardContainer.style.display = "flex";
+      tableContainer.style.display = "none";
+    } else {
+      cardContainer.style.display = "none";
+      tableContainer.style.display = "block";
+      updateTable();
+    }
+  });
+
+// テーブルを更新する関数
+function updateTable() {
+  console.log("Updating table...");
+  const tableBody = document.getElementById("table-body");
+  tableBody.innerHTML = ""; // 既存の行をクリア
+
+  const cards = Array.from(document.getElementsByClassName("card"));
+  console.log("Cards found:", cards);
+
+  cards.forEach((card) => {
+    const key = card.dataset.key;
+    const label = card.dataset.label;
+    const spValue = card.dataset.sp;
+
+    console.log(
+      `Processing card - Key: ${key}, Label: ${label}, SP: ${spValue}`
+    );
+
+    if (!key || !label || !spValue) {
+      console.log("Skipping invalid card");
+      return;
+    }
+
+    const selectedRadio = card.querySelector(
+      'input[name^="length-option-"]:checked'
+    );
+    console.log("Selected Radio:", selectedRadio);
+
+    if (!selectedRadio) {
+      console.log("No selected radio button found");
+      return;
+    }
+
+    const businValue = card.querySelector(
+      `#${selectedRadio.value}-${key}`
+    ).textContent;
+    console.log("Busin Value:", businValue);
+
+    const businSpValue = card.querySelector(`#busin-sp-${key}`).textContent;
+    console.log("Busin/SP Value:", businSpValue);
+
+    const hintLevelSelect = card.querySelector(`#hint-level-${key}`);
+    console.log("Hint Level Select:", hintLevelSelect);
+
+    const hintLevel = hintLevelSelect ? hintLevelSelect.value : "";
+    console.log("Hint Level:", hintLevel);
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+            <td>${label}</td>
+            <td>${businValue}</td>
+            <td>${businSpValue}</td>
+            <td>
+                <select class="form-control" onchange="updateTableRow(this, '${key}')">
+                    ${hintLevels
+                      .map(
+                        (level, index) =>
+                          `<option value="${level}" ${
+                            hintLevel == level ? "selected" : ""
+                          }>${index}</option>`
+                      )
+                      .join("")}
+                </select>
+            </td>
+        `;
+    tableBody.appendChild(row);
+  });
+}
+
+// テーブルの行を更新する関数
+function updateTableRow(selectElement, key) {
+  const hintLevel = parseFloat(selectElement.value);
+  const card = document.querySelector(`.card[data-key="${key}"]`);
+  const spValue = parseInt(card.dataset.sp);
+  const displaySpValue = Math.round(spValue * hintLevel);
+
+  document.getElementById(`sp-value-${key}`).textContent = displaySpValue;
+  updateBusinSpValue(key, displaySpValue);
+  updateTable(); // テーブルを更新
 }
 
 // スキルデータCSVをパースする関数
@@ -57,6 +141,19 @@ function parseResultCSVWithKey(text) {
     obj["key"] = `${obj.id}-${obj.skill_id}`;
     return obj;
   });
+}
+
+// 計算結果ファイルが選択されたときの処理
+function handleCalcResultFileSelect(event) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const text = e.target.result;
+    csvData = parseResultCSVWithKey(text);
+    console.log("CSV Data:", csvData);
+    populateIdSelect();
+  };
+  reader.readAsText(file);
 }
 
 // ユニークなIDを取得し、昇順にソートしてIDセレクトボックスにオプションを追加
@@ -191,6 +288,16 @@ function addCard(key, label, skillId) {
   card.dataset.median = median.toFixed(2);
   card.dataset.max = max.toFixed(2);
   card.dataset.sp = spValue;
+  card.dataset.skillId = skillId;
+
+  // 背景色を設定
+  if (!skill || skill["SP"] === "") {
+    card.style.backgroundImage =
+      "linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet)";
+  } else if (skill["下位スキル"] && skill["下位スキル"] !== "") {
+    card.style.backgroundColor = "lightgoldenrodyellow";
+  }
+
   card.innerHTML = `
         <div class="card-body">
             <h5 class="card-title">ラベル: ${label}</h5>
@@ -227,6 +334,7 @@ function addCard(key, label, skillId) {
                       .join("")}
                 </select>
             </div>
+            <button class="btn btn-danger mt-2" onclick="removeCard('${key}')">削除</button>
         </div>
     `;
   cardCol.appendChild(card);
@@ -404,6 +512,38 @@ function handleSkillChain(selectId, initialLabel) {
   }
 }
 
+// カードを削除する関数
+function removeCard(key) {
+  const cardToRemove = document.querySelector(`.card[data-key="${key}"]`);
+  if (!cardToRemove) return;
+
+  // 下位スキルリストを初期化
+  let subSkillList = [];
+
+  // すべてのカードの下位スキルをリストに追加
+  skillData.forEach((skill) => {
+    if (skill["下位スキル"] && skill["下位スキル"] !== "") {
+      subSkillList.push(skill["下位スキル"]);
+    }
+  });
+
+  console.log("Sub Skill List:", subSkillList);
+
+  // 削除するカードのスキル名を取得
+  const skillName = csvData.find((item) => item.key == key).label;
+
+  // 下位スキルリストに存在するか確認
+  if (subSkillList.includes(skillName)) {
+    alert(`このカードには上位スキルが存在します: ${skillName}`);
+    console.log(`Cannot remove ${key} because it is a sub-skill`);
+    return;
+  }
+
+  // カードを削除
+  console.log("Removing Card:", cardToRemove);
+  cardToRemove.parentElement.remove();
+}
+
 // ソートボタンのイベントリスナー
 document.getElementById("sort-label").addEventListener("click", function () {
   sortCards("label");
@@ -470,5 +610,52 @@ function sortCards(criteria) {
   cards.forEach((card) => {
     cardContainer.appendChild(card.parentElement);
     console.log(`Appended Card - Key: ${card.dataset.key}`);
+  });
+}
+
+// テーブルヘッダーにソート機能を追加
+document.getElementById("sort-label").addEventListener("click", function () {
+  sortTable("label");
+});
+document.getElementById("sort-length").addEventListener("click", function () {
+  sortTable("length");
+});
+document.getElementById("sort-sp").addEventListener("click", function () {
+  sortTable("sp");
+});
+document.getElementById("sort-busin-sp").addEventListener("click", function () {
+  sortTable("businSp");
+});
+
+// テーブルをソートする関数
+function sortTable(criteria) {
+  const tableBody = document.getElementById("table-body");
+  const rows = Array.from(tableBody.getElementsByTagName("tr"));
+
+  rows.sort((a, b) => {
+    let aValue, bValue;
+    if (criteria === "label") {
+      aValue = a.cells[0].textContent;
+      bValue = b.cells[0].textContent;
+      return aValue.localeCompare(bValue);
+    } else if (criteria === "length") {
+      aValue = parseFloat(a.cells[1].textContent);
+      bValue = parseFloat(b.cells[1].textContent);
+      return bValue - aValue; // 大きい順に並べ替え
+    } else if (criteria === "businSp") {
+      aValue = parseFloat(a.cells[2].textContent);
+      bValue = parseFloat(b.cells[2].textContent);
+      return bValue - aValue; // 大きい順に並べ替え
+    } else if (criteria === "sp") {
+      aValue = parseInt(a.cells[3].textContent);
+      bValue = parseInt(b.cells[3].textContent);
+      return aValue - bValue; // 小さい順に並べ替え
+    }
+  });
+
+  // 並び替えた行をテーブルに再追加
+  tableBody.innerHTML = "";
+  rows.forEach((row) => {
+    tableBody.appendChild(row);
   });
 }
