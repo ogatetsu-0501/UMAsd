@@ -1,23 +1,39 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
 }
 
 h1 {
     text-align: center;
-}
-
-div {
-    margin-bottom: 10px;
-}
-
-#card-container {
-    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .card {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
+    margin-bottom: 1rem;
+    background-color: #ffffff;
+    border: 1px solid #007bff;
+    border-radius: 0.25rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.card-text {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    font-weight: bold;
+}
+
+#sort-buttons {
+    justify-content: center;
+}
+
+#sort-buttons .btn {
+    flex: 1;
+    margin: 5px;
 }

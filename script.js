@@ -180,34 +180,60 @@ function addCard(key, label, skillId) {
   console.log("Skill Data:", skill);
   console.log("SP Value:", spValue);
 
+  const cardCol = document.createElement("div");
+  cardCol.className = "col-md-6 col-lg-4 mb-4";
+
   const card = document.createElement("div");
-  card.className = "card";
+  card.className = "card border-primary shadow-sm";
+  card.dataset.key = key;
+  card.dataset.label = label;
+  card.dataset.average = average.toFixed(2);
+  card.dataset.median = median.toFixed(2);
+  card.dataset.max = max.toFixed(2);
+  card.dataset.sp = spValue;
   card.innerHTML = `
-        <strong>Key:</strong> ${key} <br>
-        <strong>ラベル:</strong> ${label} <br>
-        <strong>SP:</strong> <span id="sp-value-${key}">${spValue}</span> <br>
-        <label>
-            <input type="radio" name="length-option-${key}" value="average" checked>
-            平均バ身: ${average.toFixed(2)}
-        </label> <br>
-        <label>
-            <input type="radio" name="length-option-${key}" value="median">
-            中央値バ身: ${median.toFixed(2)}
-        </label> <br>
-        <label>
-            <input type="radio" name="length-option-${key}" value="max">
-            最大バ身: ${max.toFixed(2)}
-        </label> <br>
-        <label for="hint-level-${key}">ヒントレベル:</label>
-        <select id="hint-level-${key}">
-            ${hintLevels
-              .map(
-                (level, index) => `<option value="${level}">${index}</option>`
-              )
-              .join("")}
-        </select>
+        <div class="card-body">
+            <h5 class="card-title">ラベル: ${label}</h5>
+            <p class="card-text">
+                <strong>SP:</strong> <span id="sp-value-${key}">${spValue}</span><br>
+                <strong>バ身/SP:</strong> <span id="busin-sp-${key}"></span><br>
+            </p>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="length-option-${key}" value="average" checked>
+                <label class="form-check-label" for="average-${key}">平均バ身: <span id="average-${key}">${average.toFixed(
+    2
+  )}</span></label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="length-option-${key}" value="median">
+                <label class="form-check-label" for="median-${key}">中央値バ身: <span id="median-${key}">${median.toFixed(
+    2
+  )}</span></label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="length-option-${key}" value="max">
+                <label class="form-check-label" for="max-${key}">最大バ身: <span id="max-${key}">${max.toFixed(
+    2
+  )}</span></label>
+            </div>
+            <div class="form-group">
+                <label for="hint-level-${key}">ヒントレベル:</label>
+                <select id="hint-level-${key}" class="form-control">
+                    ${hintLevels
+                      .map(
+                        (level, index) =>
+                          `<option value="${level}">${index}</option>`
+                      )
+                      .join("")}
+                </select>
+            </div>
+        </div>
     `;
-  cardContainer.appendChild(card);
+  cardCol.appendChild(card);
+  cardContainer.appendChild(cardCol);
+
+  // バ身/SPを更新する関数を呼び出し
+  updateBusinSpValue(key, spValue);
 
   // ヒントレベルのプルダウンが更新された時のイベントリスナーを追加
   document
@@ -216,7 +242,83 @@ function addCard(key, label, skillId) {
       const hintLevel = parseFloat(this.value);
       const displaySpValue = Math.round(spValue * hintLevel);
       document.getElementById(`sp-value-${key}`).textContent = displaySpValue;
+      console.log(
+        `Hint Level Changed - Key: ${key}, Hint Level: ${hintLevel}, Display SP Value: ${displaySpValue}`
+      );
+      updateBusinSpValue(key, displaySpValue);
     });
+
+  // ラジオボタンが変更されたときのイベントリスナーを追加
+  document
+    .querySelectorAll(`input[name="length-option-${key}"]`)
+    .forEach((radio) => {
+      radio.addEventListener("change", function () {
+        console.log(
+          `Radio Button Changed - Key: ${key}, Value: ${radio.value}`
+        );
+        updateBusinSpValue(
+          key,
+          document.getElementById(`sp-value-${key}`).textContent
+        );
+      });
+    });
+}
+
+// バ身/SPを更新する関数
+function updateBusinSpValue(key, spValue) {
+  console.log(`Updating Busin/SP - Key: ${key}, SP Value: ${spValue}`);
+  const selectedRadio = document.querySelector(
+    `input[name="length-option-${key}"]:checked`
+  );
+  console.log(`Selected Radio: ${selectedRadio.value}`);
+  const businValue = document.getElementById(
+    `${selectedRadio.value}-${key}`
+  ).textContent;
+  console.log(`Busin Value: ${businValue}`);
+  const businSpValue = (
+    (parseFloat(businValue) / parseFloat(spValue)) *
+    100
+  ).toFixed(2);
+  console.log(`Busin/SP Value: ${businSpValue}`);
+  document.getElementById(`busin-sp-${key}`).textContent = businSpValue;
+  document.querySelector(`.card[data-key="${key}"]`).dataset.businSp =
+    businSpValue;
+}
+
+// 親のカードの平均バ身、中央値バ身、最大バ身を更新する関数
+function updateParentCardValues(
+  parentKey,
+  childAverage,
+  childMedian,
+  childMax
+) {
+  const parentCardAverageElem = document.getElementById(`average-${parentKey}`);
+  const parentCardMedianElem = document.getElementById(`median-${parentKey}`);
+  const parentCardMaxElem = document.getElementById(`max-${parentKey}`);
+
+  if (parentCardAverageElem) {
+    const parentAverage = parseFloat(parentCardAverageElem.textContent);
+    const newAverage = parentAverage - childAverage;
+    parentCardAverageElem.textContent = newAverage.toFixed(2);
+  }
+
+  if (parentCardMedianElem) {
+    const parentMedian = parseFloat(parentCardMedianElem.textContent);
+    const newMedian = parentMedian - childMedian;
+    parentCardMedianElem.textContent = newMedian.toFixed(2);
+  }
+
+  if (parentCardMaxElem) {
+    const parentMax = parseFloat(parentCardMaxElem.textContent);
+    const newMax = parentMax - childMax;
+    parentCardMaxElem.textContent = newMax.toFixed(2);
+  }
+
+  // 親のバ身/SPも更新
+  const parentSpValue = parseInt(
+    document.getElementById(`sp-value-${parentKey}`).textContent
+  );
+  updateBusinSpValue(parentKey, parentSpValue);
 }
 
 // スキルチェーンを処理する関数
@@ -232,6 +334,8 @@ function handleSkillChain(selectId, initialLabel) {
 
   // 現在のスキルIDを取得
   let skillId = currentSkill.skill_id;
+
+  const parentKey = `${currentSkill.id}-${currentSkill.skill_id}`;
 
   // スキルチェーンを処理するループ
   while (skillId) {
@@ -268,6 +372,29 @@ function handleSkillChain(selectId, initialLabel) {
     // 組み合わせスキルが存在する場合、カードを追加
     if (combinedSkill) {
       addCard(combinedId, combinedSkill.label, subSkillId);
+
+      // 子の平均バ身、中央値バ身、最大バ身を取得
+      const childMatchingItems = csvData.filter(
+        (item) => item.key === combinedId
+      );
+      const childLengths = childMatchingItems
+        .map((item) => parseFloat(item.length))
+        .filter((length) => !isNaN(length));
+      let childAverage = 0;
+      let childMedian = 0;
+      let childMax = 0;
+
+      if (childLengths.length > 0) {
+        childAverage =
+          childLengths.reduce((a, b) => a + b, 0) / childLengths.length;
+        childLengths.sort((a, b) => a - b);
+        childMedian = childLengths[Math.floor(childLengths.length / 2)];
+        childMax = Math.max(...childLengths);
+      }
+
+      // 親のカードの平均バ身、中央値バ身、最大バ身を更新
+      updateParentCardValues(parentKey, childAverage, childMedian, childMax);
+
       // 次のスキルIDを更新してループを続ける
       skillId = subSkillId;
     } else {
@@ -275,4 +402,73 @@ function handleSkillChain(selectId, initialLabel) {
       break;
     }
   }
+}
+
+// ソートボタンのイベントリスナー
+document.getElementById("sort-label").addEventListener("click", function () {
+  sortCards("label");
+});
+document.getElementById("sort-length").addEventListener("click", function () {
+  sortCards("length");
+});
+document.getElementById("sort-sp").addEventListener("click", function () {
+  sortCards("sp");
+});
+document.getElementById("sort-busin-sp").addEventListener("click", function () {
+  sortCards("businSp");
+});
+
+// カードをソートする関数
+function sortCards(criteria) {
+  const cardContainer = document.getElementById("card-container");
+  const cards = Array.from(cardContainer.getElementsByClassName("card"));
+
+  console.log("Sorting Criteria:", criteria);
+  cards.forEach((card) => {
+    console.log(
+      `Card Data - Key: ${card.dataset.key}, Label: ${card.dataset.label}, Average: ${card.dataset.average}, Median: ${card.dataset.median}, Max: ${card.dataset.max}, SP: ${card.dataset.sp}, BusinSp: ${card.dataset.businSp}`
+    );
+  });
+
+  cards.sort((a, b) => {
+    let aValue, bValue;
+    if (criteria === "length") {
+      const aRadio = a.querySelector('input[name^="length-option-"]:checked');
+      const bRadio = b.querySelector('input[name^="length-option-"]:checked');
+      aValue = parseFloat(
+        a.querySelector(`#${aRadio.value}-${a.dataset.key}`).textContent
+      );
+      bValue = parseFloat(
+        b.querySelector(`#${bRadio.value}-${b.dataset.key}`).textContent
+      );
+      return bValue - aValue; // 大きい順に並べ替え
+    } else if (criteria === "businSp") {
+      aValue = parseFloat(
+        a.querySelector("#busin-sp-" + a.dataset.key).textContent
+      );
+      bValue = parseFloat(
+        b.querySelector("#busin-sp-" + b.dataset.key).textContent
+      );
+      return bValue - aValue; // 大きい順に並べ替え
+    } else if (criteria === "sp") {
+      aValue = parseFloat(
+        a.querySelector("#sp-value-" + a.dataset.key).textContent
+      );
+      bValue = parseFloat(
+        b.querySelector("#sp-value-" + b.dataset.key).textContent
+      );
+      return aValue - bValue; // 小さい順に並べ替え
+    } else {
+      aValue = a.dataset[criteria];
+      bValue = b.dataset[criteria];
+      return aValue.localeCompare(bValue); // アルファベット順に並べ替え
+    }
+  });
+
+  // 並び替えたカードをコンテナに再追加
+  cardContainer.innerHTML = "";
+  cards.forEach((card) => {
+    cardContainer.appendChild(card.parentElement);
+    console.log(`Appended Card - Key: ${card.dataset.key}`);
+  });
 }

@@ -4,28 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>計算ツール</title>
-    <link rel="stylesheet" href="style.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>計算ツール</h1>
-    <input type="file" id="calc-result-file-input" accept=".csv">
-    <div>
-        <label for="id-select">IDを選択:</label>
-        <select id="id-select">
-            <!-- 動的にJavaScriptでオプションを追加します -->
-        </select>
-    </div>
-    <div>
-        <label for="label-input">ラベルを入力:</label>
-        <input type="text" id="label-input" list="label-datalist">
-        <datalist id="label-datalist">
-            <!-- 動的にJavaScriptでオプションを追加します -->
-        </datalist>
-    </div>
-    <button id="add-button" disabled>追加</button>
-    <div id="card-container">
-        <!-- ここにカードが追加されます -->
+    <div class="container mt-4">
+        <h1>計算ツール</h1>
+        <div class="form-group">
+            <label for="calc-result-file-input">計算結果ファイルを選択:</label>
+            <input type="file" class="form-control-file" id="calc-result-file-input" accept=".csv">
+        </div>
+        <div class="form-group">
+            <label for="id-select">IDを選択:</label>
+            <select id="id-select" class="form-control">
+                <!-- 動的にJavaScriptでオプションを追加します -->
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="label-input">ラベルを入力または選択:</label>
+            <input list="label-datalist" id="label-input" class="form-control">
+            <datalist id="label-datalist">
+                <!-- 動的にJavaScriptでオプションを追加します -->
+            </datalist>
+        </div>
+        <button id="add-button" class="btn btn-primary" disabled>追加</button>
+
+        <div class="card mt-4 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">ソート</h5>
+                <div id="sort-buttons" class="d-flex flex-wrap">
+                    <button id="sort-label" class="btn btn-secondary m-1">ラベル</button>
+                    <button id="sort-length" class="btn btn-secondary m-1">バ身</button>
+                    <button id="sort-sp" class="btn btn-secondary m-1">SP</button>
+                    <button id="sort-busin-sp" class="btn btn-secondary m-1">バ身/SP</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="card-container" class="row mt-4">
+            <!-- カードをここに追加します -->
+        </div>
     </div>
     <script src="script.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
