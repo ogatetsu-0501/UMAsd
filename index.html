@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- Google Sign-In ボタン -->
     <div
       id="g_id_onload"
       data-client_id="419289898044-cmcu306a6ppu93j91is7nca05f5jvgmp.apps.googleusercontent.com"
@@ -27,23 +26,17 @@
       data-shape="rectangular"
       data-logo_alignment="left"
     ></div>
-
-    <!-- サインイン後に表示されるコンテンツ -->
     <div id="content-container" style="display: none">
       <div class="container mt-4">
         <h1>計算ツール</h1>
         <div class="form-group">
           <label for="id-select">IDを選択:</label>
-          <select id="id-select" class="form-control">
-            <!-- 動的にJavaScriptでオプションを追加します -->
-          </select>
+          <select id="id-select" class="form-control"></select>
         </div>
         <div class="form-group">
           <label for="label-input">ラベルを入力または選択:</label>
           <input list="label-datalist" id="label-input" class="form-control" />
-          <datalist id="label-datalist">
-            <!-- 動的にJavaScriptでオプションを追加します -->
-          </datalist>
+          <datalist id="label-datalist"> </datalist>
         </div>
         <button id="add-button" class="btn btn-primary" disabled>追加</button>
 
@@ -69,9 +62,7 @@
           表示形式を切り替え
         </button>
 
-        <div id="card-container" class="row mt-4">
-          <!-- カードをここに追加します -->
-        </div>
+        <div id="card-container" class="row mt-4"></div>
 
         <div id="table-container" class="mt-4" style="display: none">
           <table class="table table-bordered">
@@ -83,15 +74,12 @@
                 <th>ヒントレベル</th>
               </tr>
             </thead>
-            <tbody id="table-body">
-              <!-- テーブル行をここに追加します -->
-            </tbody>
+            <tbody id="table-body"></tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- エラーメッセージの表示 -->
     <div
       id="error-container"
       style="display: none; text-align: center; color: red"
