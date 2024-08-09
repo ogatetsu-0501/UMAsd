@@ -45,7 +45,7 @@ async function fetchEncryptedWhitelist(filePath) {
 }
 
 // 使用例
-const key = "thisisaverysecret"; // Pythonで使用したのと同じキー
+const key = "thisisaversecret"; // Pythonで使用したのと同じキー
 const csvFilePath = "./new_white.csv"; // new_white.csv のパス（JavaScriptファイルと同じ階層）
 
 // ホワイトリスト（許可されたメールアドレスのリスト）
