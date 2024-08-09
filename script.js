@@ -1,3 +1,10 @@
+// ホワイトリスト（許可されたメールアドレスのリスト）
+const allowedEmails = [
+  "allowed@example.com",
+  "another.allowed@example.com",
+  // 追加の許可メールアドレスをここに記載
+];
+
 // Google Sign-Inからのレスポンスを処理する関数
 function handleCredentialResponse(response) {
   // JWT IDトークンを取得
@@ -11,9 +18,16 @@ function handleCredentialResponse(response) {
   console.log("Image URL: " + responsePayload.picture);
   console.log("Email: " + responsePayload.email);
 
-  // サインインに成功したらコンテンツを表示し、サインインボタンを非表示にする
-  document.getElementById("g_id_onload").style.display = "none";
-  document.getElementById("content-container").style.display = "block";
+  // メールアドレスがホワイトリストにあるか確認
+  if (allowedEmails.includes(responsePayload.email)) {
+    // サインインに成功したらコンテンツを表示し、サインインボタンを非表示にする
+    document.getElementById("g_id_onload").style.display = "none";
+    document.getElementById("content-container").style.display = "block";
+  } else {
+    // 許可されていないメールアドレスの場合、エラーメッセージを表示
+    document.getElementById("g_id_onload").style.display = "none";
+    document.getElementById("error-container").style.display = "block";
+  }
 }
 
 // JWTトークンをデコードする関数
@@ -31,6 +45,8 @@ function parseJwt(token) {
 
   return JSON.parse(jsonPayload);
 }
+
+// 計算ツールのためのスクリプト
 
 document
   .getElementById("calc-result-file-input")
@@ -708,52 +724,4 @@ function sortTable(criteria) {
   rows.forEach((row) => {
     tableBody.appendChild(row);
   });
-}
-
-// ホワイトリスト（許可されたメールアドレスのリスト）
-const allowedEmails = [
-  "ogatetsunietono@gmail.com",
-  "another.allowed@example.com",
-  // 追加の許可メールアドレスをここに記載
-];
-
-// Google Sign-Inからのレスポンスを処理する関数
-function handleCredentialResponse(response) {
-  // JWT IDトークンを取得
-  console.log("Encoded JWT ID token: " + response.credential);
-
-  // トークンをデコードし、必要に応じてユーザー情報を取得
-  const responsePayload = parseJwt(response.credential);
-
-  console.log("ID: " + responsePayload.sub);
-  console.log("Name: " + responsePayload.name);
-  console.log("Image URL: " + responsePayload.picture);
-  console.log("Email: " + responsePayload.email);
-
-  // メールアドレスがホワイトリストにあるか確認
-  if (allowedEmails.includes(responsePayload.email)) {
-    // サインインに成功したらコンテンツを表示し、サインインボタンを非表示にする
-    document.getElementById("g_id_onload").style.display = "none";
-    document.getElementById("content-container").style.display = "block";
-  } else {
-    // 許可されていないメールアドレスの場合、エラーメッセージを表示
-    document.getElementById("g_id_onload").style.display = "none";
-    document.getElementById("error-container").style.display = "block";
-  }
-}
-
-// JWTトークンをデコードする関数
-function parseJwt(token) {
-  var base64Url = token.split(".")[1];
-  var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-  var jsonPayload = decodeURIComponent(
-    atob(base64)
-      .split("")
-      .map(function (c) {
-        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-      })
-      .join("")
-  );
-
-  return JSON.parse(jsonPayload);
 }
