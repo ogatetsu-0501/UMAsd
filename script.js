@@ -15,7 +15,42 @@ window.onload = function () {
       skillData = parseSkillCSV(text);
       console.log("Skill Data:", skillData);
     });
+  initGoogleSignIn(); // Googleサインインの初期化
 };
+
+// Googleサインインの初期化
+function initGoogleSignIn() {
+  gapi.load("auth2", function () {
+    gapi.auth2.init({
+      client_id:
+        "419289898044-cmcu306a6ppu93j91is7nca05f5jvgmp.apps.googleusercontent.com",
+    });
+  });
+}
+
+// サインインが成功したときに呼び出される関数
+function onSignIn(googleUser) {
+  var profile = googleUser.getBasicProfile();
+  console.log("ID: " + profile.getId());
+  console.log("Name: " + profile.getName());
+  console.log("Image URL: " + profile.getImageUrl());
+  console.log("Email: " + profile.getEmail());
+
+  // サインインに成功したらコンテンツを表示し、サインインボタンを非表示にする
+  document.getElementById("signin-container").style.display = "none";
+  document.getElementById("content-container").style.display = "block";
+}
+
+// サインインボタンがクリックされたときにリダイレクトフローを開始
+document.getElementById("signin-button").addEventListener("click", function () {
+  var auth2 = gapi.auth2.getAuthInstance();
+  auth2
+    .signIn({
+      scope: "profile email",
+      ux_mode: "redirect",
+    })
+    .then(onSignIn);
+});
 
 // 表示形式を切り替えるボタンのイベントリスナー
 document
@@ -673,28 +708,5 @@ function sortTable(criteria) {
   tableBody.innerHTML = "";
   rows.forEach((row) => {
     tableBody.appendChild(row);
-  });
-}
-
-function onSignIn(googleUser) {
-  // ユーザーのプロフィール情報を取得する（必要に応じて使用）
-  var profile = googleUser.getBasicProfile();
-  console.log("ID: " + profile.getId()); // ユーザーIDをログに出力
-  console.log("Name: " + profile.getName()); // ユーザー名をログに出力
-  console.log("Image URL: " + profile.getImageUrl()); // プロフィール画像URLをログに出力
-  console.log("Email: " + profile.getEmail()); // メールアドレスをログに出力
-
-  // ログインが成功した場合にコンテンツを表示
-  document.getElementById("signin-container").style.display = "none";
-  document.getElementById("content-container").style.display = "block";
-}
-
-function signOut() {
-  var auth2 = gapi.auth2.getAuthInstance();
-  auth2.signOut().then(function () {
-    console.log("User signed out.");
-    // サインアウト後にコンテンツを非表示にし、サインインボタンを再表示
-    document.getElementById("signin-container").style.display = "block";
-    document.getElementById("content-container").style.display = "none";
   });
 }

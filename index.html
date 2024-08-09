@@ -15,9 +15,14 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <!-- サインインボタンのコンテナ -->
     <div id="signin-container" style="text-align: center; margin-top: 100px">
-      <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+      <button id="signin-button" class="btn btn-primary">
+        Googleでサインイン
+      </button>
     </div>
+
+    <!-- サインイン後に表示されるコンテンツ -->
     <div id="content-container" style="display: none">
       <div class="container mt-4">
         <h1>計算ツール</h1>
@@ -88,6 +93,7 @@
         </div>
       </div>
     </div>
+
     <script src="script.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
