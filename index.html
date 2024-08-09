@@ -2,33 +2,31 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>計算ツール</title>
     <link
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
   </head>
   <body>
-    <!-- サインインボタンのコンテナ -->
-    <div id="signin-container" style="text-align: center; margin-top: 100px">
-      <div
-        id="g_id_onload"
-        data-client_id="419289898044-cmcu306a6ppu93j91is7nca05f5jvgmp.apps.googleusercontent.com"
-        data-callback="handleCredentialResponse"
-        data-auto_prompt="false"
-      ></div>
-      <div
-        class="g_id_signin"
-        data-type="standard"
-        data-size="large"
-        data-theme="outline"
-        data-text="sign_in_with"
-        data-shape="rectangular"
-        data-logo_alignment="left"
-      ></div>
-    </div>
+    <!-- Google Sign-In ボタン -->
+    <div
+      id="g_id_onload"
+      data-client_id="419289898044-cmcu306a6ppu93j91is7nca05f5jvgmp.apps.googleusercontent.com"
+      data-callback="handleCredentialResponse"
+      data-auto_prompt="false"
+    ></div>
+    <div
+      class="g_id_signin"
+      data-type="standard"
+      data-size="large"
+      data-theme="outline"
+      data-text="sign_in_with"
+      data-shape="rectangular"
+      data-logo_alignment="left"
+    ></div>
 
     <!-- サインイン後に表示されるコンテンツ -->
     <div id="content-container" style="display: none">
@@ -100,6 +98,13 @@
           </table>
         </div>
       </div>
+    </div>
+    <!-- エラーメッセージの表示 -->
+    <div
+      id="error-container"
+      style="display: none; text-align: center; color: red"
+    >
+      <p>このメールアドレスではログインできません。</p>
     </div>
 
     <script src="script.js"></script>
