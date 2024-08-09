@@ -32,31 +32,31 @@ async function decryptWhitelist(encryptedWhitelist, key) {
   return decodedWhitelist.split(",");
 }
 
-// CSVファイルを読み込んで3行目を取得する関数
-async function fetchEncryptedWhitelist(filePath) {
+// CSVファイルからヘッダーと3行目を読み込む関数
+async function fetchKeyAndEncryptedWhitelist(filePath) {
   const response = await fetch(filePath);
   const text = await response.text();
   const lines = text.split("\n");
-  // 3行目のデータを取得（2つの改行を考慮）
-  const encryptedWhitelist = lines[2].trim(); // 3行目の内容を取得
-  console.log(encryptedWhitelist);
-  return encryptedWhitelist;
+
+  // 1行目（ヘッダー）からキーを取得
+  const key = lines[0].trim();
+
+  // 3行目から暗号化されたホワイトリストを取得
+  const encryptedWhitelist = lines[1].trim(); // 2行目の内容を取得
+
+  return { key, encryptedWhitelist };
 }
 
 // 使用例
-const key = "thisisaversecret"; // Pythonで使用したのと同じキー
 const csvFilePath = "./new_white.csv"; // new_white.csv のパス（JavaScriptファイルと同じ階層）
 
 // ホワイトリスト（許可されたメールアドレスのリスト）
 let allowedEmails = [];
 
-// CSVファイルから暗号化されたホワイトリストを読み込み、復号して配列に設定
-fetchEncryptedWhitelist(csvFilePath)
-  .then((encryptedWhitelist) => {
-    return decryptWhitelist(encryptedWhitelist, key);
-  })
-  .then((whitelist) => {
-    allowedEmails = whitelist;
+// CSVファイルからキーと暗号化されたホワイトリストを読み込み、復号して配列に設定
+fetchKeyAndEncryptedWhitelist(csvFilePath)
+  .then(async ({ key, encryptedWhitelist }) => {
+    allowedEmails = await decryptWhitelist(encryptedWhitelist, key);
     console.log("Decrypted and set allowed emails:", allowedEmails);
 
     // 復号後の処理をここに記述（例: Google Sign-In処理の続行）
