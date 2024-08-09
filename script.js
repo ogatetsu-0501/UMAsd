@@ -39,6 +39,7 @@ function onSignIn(googleUser) {
   // サインインに成功したらコンテンツを表示し、サインインボタンを非表示にする
   document.getElementById("signin-container").style.display = "none";
   document.getElementById("content-container").style.display = "block";
+  console.log("コンテンツが表示されました");
 }
 
 // サインインボタンがクリックされたときにリダイレクトフローを開始
