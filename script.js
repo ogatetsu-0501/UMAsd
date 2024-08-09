@@ -1,6 +1,6 @@
 // ホワイトリスト（許可されたメールアドレスのリスト）
 const allowedEmails = [
-  "ogatetsunietiono@gmail.com",
+  "ogatetsunietono@gmail.com",
   "another.allowed@example.com",
   // 追加の許可メールアドレスをここに記載
 ];
