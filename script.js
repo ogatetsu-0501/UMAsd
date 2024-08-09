@@ -1,3 +1,37 @@
+// Google Sign-Inからのレスポンスを処理する関数
+function handleCredentialResponse(response) {
+  // JWT IDトークンを取得
+  console.log("Encoded JWT ID token: " + response.credential);
+
+  // トークンをデコードし、必要に応じてユーザー情報を取得
+  const responsePayload = parseJwt(response.credential);
+
+  console.log("ID: " + responsePayload.sub);
+  console.log("Name: " + responsePayload.name);
+  console.log("Image URL: " + responsePayload.picture);
+  console.log("Email: " + responsePayload.email);
+
+  // サインインに成功したらコンテンツを表示し、サインインボタンを非表示にする
+  document.getElementById("g_id_onload").style.display = "none";
+  document.getElementById("content-container").style.display = "block";
+}
+
+// JWTトークンをデコードする関数
+function parseJwt(token) {
+  var base64Url = token.split(".")[1];
+  var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  var jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split("")
+      .map(function (c) {
+        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+      })
+      .join("")
+  );
+
+  return JSON.parse(jsonPayload);
+}
+
 document
   .getElementById("calc-result-file-input")
   .addEventListener("change", handleCalcResultFileSelect);
@@ -15,43 +49,7 @@ window.onload = function () {
       skillData = parseSkillCSV(text);
       console.log("Skill Data:", skillData);
     });
-  initGoogleSignIn(); // Googleサインインの初期化
 };
-
-// Googleサインインの初期化
-function initGoogleSignIn() {
-  gapi.load("auth2", function () {
-    gapi.auth2.init({
-      client_id:
-        "419289898044-cmcu306a6ppu93j91is7nca05f5jvgmp.apps.googleusercontent.com",
-    });
-  });
-}
-
-// サインインが成功したときに呼び出される関数
-function onSignIn(googleUser) {
-  var profile = googleUser.getBasicProfile();
-  console.log("ID: " + profile.getId());
-  console.log("Name: " + profile.getName());
-  console.log("Image URL: " + profile.getImageUrl());
-  console.log("Email: " + profile.getEmail());
-
-  // サインインに成功したらコンテンツを表示し、サインインボタンを非表示にする
-  document.getElementById("signin-container").style.display = "none";
-  document.getElementById("content-container").style.display = "block";
-  console.log("コンテンツが表示されました");
-}
-
-// サインインボタンがクリックされたときにリダイレクトフローを開始
-document.getElementById("signin-button").addEventListener("click", function () {
-  var auth2 = gapi.auth2.getAuthInstance();
-  auth2
-    .signIn({
-      scope: "profile email",
-      ux_mode: "redirect",
-    })
-    .then(onSignIn);
-});
 
 // 表示形式を切り替えるボタンのイベントリスナー
 document
