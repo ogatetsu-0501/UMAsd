@@ -24,11 +24,11 @@ def read_whitelist_from_csv(file_path):
         whitelist = ','.join(row[0] for row in reader)
     return whitelist
 
-def write_encrypted_whitelist_to_csv(encrypted_whitelist, output_file_path):
+def write_encrypted_whitelist_to_csv(encrypted_whitelist, key, output_file_path):
     with open(output_file_path, mode='w', encoding='utf-8') as file:
         writer = csv.writer(file)
-        writer.writerow(['encrypted_whitelist'])
-        writer.writerow([encrypted_whitelist])
+        writer.writerow([key.decode('utf-8')])  # ヘッダーにキーを設定
+        writer.writerow([encrypted_whitelist])  # 暗号化されたホワイトリストを2行目に設定
 
 # 使用例
 csv_file_path = 'white.csv'        # 入力となるホワイトリストのCSVファイル
@@ -43,6 +43,6 @@ print(f"Original Whitelist: {whitelist}")
 encrypted_whitelist = encrypt_whitelist(whitelist, key)
 
 # 暗号化されたホワイトリストを新しいCSVファイルに保存
-write_encrypted_whitelist_to_csv(encrypted_whitelist, output_file_path)
+write_encrypted_whitelist_to_csv(encrypted_whitelist, key, output_file_path)
 
 print(f"Encrypted Whitelist saved to {output_file_path}")
