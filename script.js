@@ -184,17 +184,24 @@ function updateLabelOptions(selectedId) {
   const labelInput = document.getElementById("label-input");
   const labelDatalist = document.getElementById("label-datalist");
   labelDatalist.innerHTML = ""; // 既存のオプションをクリア
+
   if (selectedId) {
-    currentLabels = [
+    // skill_id + labelの組み合わせがユニークなものを作成
+    const uniqueSkillLabelCombinations = [
       ...new Set(
         csvData
           .filter((item) => item.id == selectedId)
-          .map((item) => item.label)
+          .map((item) => `${item.skill_id}-${item.label}`)
       ),
     ];
-    currentLabels.forEach((label) => {
+
+    // currentLabels を skill_id + label で設定
+    currentLabels = uniqueSkillLabelCombinations;
+
+    // プルダウンに候補を追加 (skill_id + label を表示)
+    uniqueSkillLabelCombinations.forEach((combination) => {
       const option = document.createElement("option");
-      option.value = label;
+      option.value = combination; // skill_id + label の組み合わせを表示
       labelDatalist.appendChild(option);
     });
   }
@@ -220,22 +227,26 @@ document.getElementById("label-input").addEventListener("input", function () {
 // 入力値を検証して追加ボタンの有効・無効を切り替える関数
 function validateInput() {
   const selectedId = document.getElementById("id-select").value;
-  const selectedLabel = document.getElementById("label-input").value;
+  const selectedLabelCombination = document.getElementById("label-input").value;
   const addButton = document.getElementById("add-button");
-  if (selectedId && currentLabels.includes(selectedLabel)) {
-    addButton.disabled = false;
-  } else {
-    addButton.disabled = true;
-  }
+
+  // 入力された値が currentLabels に存在するかチェック
+  const isValid = currentLabels.includes(selectedLabelCombination);
+
+  addButton.disabled = !(selectedId && isValid);
 }
 
-// 追加ボタンのクリックイベントリスナー
+// 追加ボタンのクリックイベントリスナーの修正
 document.getElementById("add-button").addEventListener("click", function () {
   const selectedId = document.getElementById("id-select").value;
-  const selectedLabel = document.getElementById("label-input").value;
-  if (selectedId && selectedLabel) {
+  const selectedLabelCombination = document.getElementById("label-input").value;
+  if (selectedId && selectedLabelCombination) {
+    const [skillId, selectedLabel] = selectedLabelCombination.split("-");
     const initialSkill = csvData.find(
-      (item) => item.id == selectedId && item.label == selectedLabel
+      (item) =>
+        item.id == selectedId &&
+        item.label == selectedLabel &&
+        item.skill_id == skillId
     );
     console.log("Initial Skill:", initialSkill);
     addCard(initialSkill.key, selectedLabel, initialSkill.skill_id);
@@ -293,9 +304,9 @@ function addCard(key, label, skillId) {
   // 背景色を設定
   if (!skill || skill["SP"] === "") {
     card.style.backgroundImage =
-      "linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet)";
+      "linear-gradient(45deg, rgba(255, 0, 0, 0.2), rgba(255, 165, 0, 0.2), rgba(255, 255, 0, 0.2), rgba(0, 128, 0, 0.2), rgba(0, 0, 255, 0.2), rgba(75, 0, 130, 0.2), rgba(238, 130, 238, 0.2))";
   } else if (skill["下位スキル"] && skill["下位スキル"] !== "") {
-    card.style.backgroundColor = "lightgoldenrodyellow";
+    card.style.backgroundColor = "rgba(255, 248, 220, 0.7)"; // lightgoldenrodyellow を薄く
   }
 
   card.innerHTML = `
