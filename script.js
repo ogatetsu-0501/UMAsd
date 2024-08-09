@@ -1,10 +1,70 @@
+// AES復号の関数
+async function decryptWhitelist(encryptedWhitelist, key) {
+  // Base64デコード
+  const encryptedData = Uint8Array.from(atob(encryptedWhitelist), (c) =>
+    c.charCodeAt(0)
+  );
+
+  // IVを抽出
+  const iv = encryptedData.slice(0, 16);
+
+  // 暗号文を抽出
+  const encrypted = encryptedData.slice(16);
+
+  // AES-CBCモードで復号
+  const cryptoKey = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(key),
+    { name: "AES-CBC" },
+    false,
+    ["decrypt"]
+  );
+
+  const decrypted = await crypto.subtle.decrypt(
+    { name: "AES-CBC", iv: iv },
+    cryptoKey,
+    encrypted
+  );
+
+  // 復号したデータをUTF-8文字列に変換
+  const decodedWhitelist = new TextDecoder().decode(decrypted);
+
+  return decodedWhitelist.split(",");
+}
+
+// CSVファイルを読み込んで3行目を取得する関数
+async function fetchEncryptedWhitelist(filePath) {
+  const response = await fetch(filePath);
+  const text = await response.text();
+  const lines = text.split("\n");
+
+  // 3行目のデータを取得（2つの改行を考慮）
+  const encryptedWhitelist = lines[2].trim(); // 3行目の内容を取得
+
+  return encryptedWhitelist;
+}
+
+// 使用例
+const key = "thisisaverysecret"; // Pythonで使用したのと同じキー
+const csvFilePath = "./new_white.csv"; // new_white.csv のパス（JavaScriptファイルと同じ階層）
+
 // ホワイトリスト（許可されたメールアドレスのリスト）
-const allowedEmails = [
-  "ogatetsunietono@gmail.com",
-  "yopin38@gmail.com",
-  "onedesu4314@gmail.com",
-  // 追加の許可メールアドレスをここに記載
-];
+let allowedEmails = [];
+
+// CSVファイルから暗号化されたホワイトリストを読み込み、復号して配列に設定
+fetchEncryptedWhitelist(csvFilePath)
+  .then((encryptedWhitelist) => {
+    return decryptWhitelist(encryptedWhitelist, key);
+  })
+  .then((whitelist) => {
+    allowedEmails = whitelist;
+    console.log("Decrypted and set allowed emails:", allowedEmails);
+
+    // 復号後の処理をここに記述（例: Google Sign-In処理の続行）
+  })
+  .catch((error) => {
+    console.error("Error while decrypting whitelist:", error);
+  });
 
 // Google Sign-Inからのレスポンスを処理する関数
 function handleCredentialResponse(response) {
