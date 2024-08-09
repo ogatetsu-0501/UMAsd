@@ -45,7 +45,7 @@ async function fetchEncryptedWhitelist(filePath) {
 }
 
 // 使用例
-const key = "thisisaversecret"; // Pythonで使用したのと同じキー
+const key = "thisisaverysecret"; // Pythonで使用したのと同じキー
 const csvFilePath = "./new_white.csv"; // new_white.csv のパス（JavaScriptファイルと同じ階層）
 
 // ホワイトリスト（許可されたメールアドレスのリスト）
@@ -110,22 +110,28 @@ function parseJwt(token) {
 
 // 計算ツールのためのスクリプト
 
-document
-  .getElementById("calc-result-file-input")
-  .addEventListener("change", handleCalcResultFileSelect);
-
 let csvData = [];
 let skillData = [];
 let currentLabels = [];
 const hintLevels = [1, 0.9, 0.8, 0.8, 0.7, 0.6];
 
-// スキルデータを自動で読み込む
+// スキルデータと計算結果データを自動で読み込む
 window.onload = function () {
+  // スキルデータの読み込み
   fetch("スキルデータ.csv")
     .then((response) => response.text())
     .then((text) => {
       skillData = parseSkillCSV(text);
       console.log("Skill Data:", skillData);
+    });
+
+  // 計算結果データの読み込み
+  fetch("計算結果.csv")
+    .then((response) => response.text())
+    .then((text) => {
+      csvData = parseResultCSVWithKey(text);
+      console.log("CSV Data:", csvData);
+      populateIdSelect(); // IDセレクトボックスを更新
     });
 };
 
@@ -253,19 +259,6 @@ function parseResultCSVWithKey(text) {
     obj["key"] = `${obj.id}-${obj.skill_id}`;
     return obj;
   });
-}
-
-// 計算結果ファイルが選択されたときの処理
-function handleCalcResultFileSelect(event) {
-  const file = event.target.files[0];
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const text = e.target.result;
-    csvData = parseResultCSVWithKey(text);
-    console.log("CSV Data:", csvData);
-    populateIdSelect();
-  };
-  reader.readAsText(file);
 }
 
 // ユニークなIDを取得し、昇順にソートしてIDセレクトボックスにオプションを追加
