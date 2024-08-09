@@ -15,71 +15,77 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
-    <div class="container mt-4">
-      <h1>計算ツール</h1>
-      <div class="form-group">
-        <label for="calc-result-file-input">計算結果ファイルを選択:</label>
-        <input
-          type="file"
-          class="form-control-file"
-          id="calc-result-file-input"
-          accept=".csv"
-        />
-      </div>
-      <div class="form-group">
-        <label for="id-select">IDを選択:</label>
-        <select id="id-select" class="form-control">
-          <!-- 動的にJavaScriptでオプションを追加します -->
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="label-input">ラベルを入力または選択:</label>
-        <input list="label-datalist" id="label-input" class="form-control" />
-        <datalist id="label-datalist">
-          <!-- 動的にJavaScriptでオプションを追加します -->
-        </datalist>
-      </div>
-      <button id="add-button" class="btn btn-primary" disabled>追加</button>
+    <div id="signin-container" style="text-align: center; margin-top: 100px">
+      <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+    </div>
+    <div id="content-container" style="display: none">
+      <div class="container mt-4">
+        <h1>計算ツール</h1>
+        <div class="form-group">
+          <label for="calc-result-file-input">計算結果ファイルを選択:</label>
+          <input
+            type="file"
+            class="form-control-file"
+            id="calc-result-file-input"
+            accept=".csv"
+          />
+        </div>
+        <div class="form-group">
+          <label for="id-select">IDを選択:</label>
+          <select id="id-select" class="form-control">
+            <!-- 動的にJavaScriptでオプションを追加します -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="label-input">ラベルを入力または選択:</label>
+          <input list="label-datalist" id="label-input" class="form-control" />
+          <datalist id="label-datalist">
+            <!-- 動的にJavaScriptでオプションを追加します -->
+          </datalist>
+        </div>
+        <button id="add-button" class="btn btn-primary" disabled>追加</button>
 
-      <div class="card mt-4 shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">ソート</h5>
-          <div id="sort-buttons" class="d-flex flex-wrap">
-            <button id="sort-label" class="btn btn-secondary m-1">
-              ラベル
-            </button>
-            <button id="sort-length" class="btn btn-secondary m-1">バ身</button>
-            <button id="sort-sp" class="btn btn-secondary m-1">SP</button>
-            <button id="sort-busin-sp" class="btn btn-secondary m-1">
-              バ身/SP
-            </button>
+        <div class="card mt-4 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">ソート</h5>
+            <div id="sort-buttons" class="d-flex flex-wrap">
+              <button id="sort-label" class="btn btn-secondary m-1">
+                ラベル
+              </button>
+              <button id="sort-length" class="btn btn-secondary m-1">
+                バ身
+              </button>
+              <button id="sort-sp" class="btn btn-secondary m-1">SP</button>
+              <button id="sort-busin-sp" class="btn btn-secondary m-1">
+                バ身/SP
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <button id="toggle-view-button" class="btn btn-info mt-4">
-        表示形式を切り替え
-      </button>
+        <button id="toggle-view-button" class="btn btn-info mt-4">
+          表示形式を切り替え
+        </button>
 
-      <div id="card-container" class="row mt-4">
-        <!-- カードをここに追加します -->
-      </div>
+        <div id="card-container" class="row mt-4">
+          <!-- カードをここに追加します -->
+        </div>
 
-      <div id="table-container" class="mt-4" style="display: none">
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th>ラベル</th>
-              <th>バ身</th>
-              <th>バ身/SP</th>
-              <th>ヒントレベル</th>
-            </tr>
-          </thead>
-          <tbody id="table-body">
-            <!-- テーブル行をここに追加します -->
-          </tbody>
-        </table>
+        <div id="table-container" class="mt-4" style="display: none">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>ラベル</th>
+                <th>バ身</th>
+                <th>バ身/SP</th>
+                <th>ヒントレベル</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <!-- テーブル行をここに追加します -->
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
     <script src="script.js"></script>

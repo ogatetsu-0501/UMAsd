@@ -675,3 +675,26 @@ function sortTable(criteria) {
     tableBody.appendChild(row);
   });
 }
+
+function onSignIn(googleUser) {
+  // ユーザーのプロフィール情報を取得する（必要に応じて使用）
+  var profile = googleUser.getBasicProfile();
+  console.log("ID: " + profile.getId()); // ユーザーIDをログに出力
+  console.log("Name: " + profile.getName()); // ユーザー名をログに出力
+  console.log("Image URL: " + profile.getImageUrl()); // プロフィール画像URLをログに出力
+  console.log("Email: " + profile.getEmail()); // メールアドレスをログに出力
+
+  // ログインが成功した場合にコンテンツを表示
+  document.getElementById("signin-container").style.display = "none";
+  document.getElementById("content-container").style.display = "block";
+}
+
+function signOut() {
+  var auth2 = gapi.auth2.getAuthInstance();
+  auth2.signOut().then(function () {
+    console.log("User signed out.");
+    // サインアウト後にコンテンツを非表示にし、サインインボタンを再表示
+    document.getElementById("signin-container").style.display = "block";
+    document.getElementById("content-container").style.display = "none";
+  });
+}
