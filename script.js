@@ -2,6 +2,7 @@
 const allowedEmails = [
   "ogatetsunietono@gmail.com",
   "yopin38@gmail.com",
+  "onedesu4314@gmail.com",
   // 追加の許可メールアドレスをここに記載
 ];
 
