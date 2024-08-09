@@ -13,17 +13,18 @@ function handleCredentialResponse(response) {
   // トークンをデコードし、必要に応じてユーザー情報を取得
   const responsePayload = parseJwt(response.credential);
 
-  console.log("ID: " + responsePayload.sub);
-  console.log("Name: " + responsePayload.name);
-  console.log("Image URL: " + responsePayload.picture);
-  console.log("Email: " + responsePayload.email);
+  // デコードしたユーザー情報をコンソールに表示
+  console.log("Decoded JWT Payload:", responsePayload);
+  console.log("User Email: " + responsePayload.email);
 
   // メールアドレスがホワイトリストにあるか確認
   if (allowedEmails.includes(responsePayload.email)) {
+    console.log("Email is in the allowed list. Access granted.");
     // サインインに成功したらコンテンツを表示し、サインインボタンを非表示にする
     document.getElementById("g_id_onload").style.display = "none";
     document.getElementById("content-container").style.display = "block";
   } else {
+    console.log("Email is NOT in the allowed list. Access denied.");
     // 許可されていないメールアドレスの場合、エラーメッセージを表示
     document.getElementById("g_id_onload").style.display = "none";
     document.getElementById("error-container").style.display = "block";
