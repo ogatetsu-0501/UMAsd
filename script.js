@@ -40,7 +40,7 @@ async function fetchEncryptedWhitelist(filePath) {
 
   // 3行目のデータを取得（2つの改行を考慮）
   const encryptedWhitelist = lines[2].trim(); // 3行目の内容を取得
-
+  console.log(encryptedWhitelist);
   return encryptedWhitelist;
 }
 
